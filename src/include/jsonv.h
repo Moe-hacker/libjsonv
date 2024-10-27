@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 /*
  *
- * This file is part of rurima, with ABSOLUTELY NO WARRANTY.
+ * This file is part of libjsonv, with ABSOLUTELY NO WARRANTY.
  *
  * MIT License
  *
@@ -14,8 +14,8 @@
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -27,13 +27,21 @@
  *
  *
  */
+#define _GNU_SOURCE
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
-// Bool!!!
+#include <fcntl.h>
+#include <signal.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <sys/ioctl.h>
+#include <termios.h>
+#include <limits.h>
+#include <dirent.h>
 #if __STDC_VERSION__ < 202000L
 #ifndef bool
 #define bool _Bool
@@ -41,4 +49,10 @@
 #define false ((_Bool) + 0u)
 #endif
 #endif
-char *json_get_key(const char *buf, char *key);
+#ifndef _Nullable
+#define _Nullable
+#endif
+char *json_get_key(const char *buf, const char *key);
+size_t json_anon_layer_get_key_array(const char *buf, const char *key, char ***array);
+char *json_anon_layer_get_key(const char *buf, const char *key, const char *value, const char *key_to_get);
+char *json_open_file(const char *path);
