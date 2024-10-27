@@ -1,6 +1,7 @@
 # About:
 This lib is part of rurima.      
 I use it to parse json from docerhub.       
+In fact I really recommend you to use json-c.       
 # Function list:
 ```C
 char *json_get_key(const char *buf, const char *key);
