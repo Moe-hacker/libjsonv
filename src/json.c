@@ -27,12 +27,12 @@
  *
  *
  */
-#include "include/jsonv.h"
+#include "include/rurima.h"
 /*
  * If there's no bugs, do not care how it works,
  * just use it.
  */
-static char *unicode_to_char(const char *str)
+static char *unicode_to_char(const char *_Nonnull str)
 {
 	/*
 	 * Warning: free() after use.
@@ -55,7 +55,7 @@ static char *unicode_to_char(const char *str)
 	result[j] = '\0';
 	return result;
 }
-static char *format_json(const char *buf)
+static char *format_json(const char *_Nonnull buf)
 {
 	/*
 	 * Warning: free() after use.
@@ -92,7 +92,7 @@ static char *format_json(const char *buf)
 	free(tmp);
 	return ret;
 }
-static char *next_key(const char *buf)
+static char *next_key(const char *_Nullable buf)
 {
 	/*
 	 * Need not to free() after use.
@@ -140,11 +140,14 @@ static char *next_key(const char *buf)
 	}
 	return NULL;
 }
-static char *next_layer(const char *buf)
+static char *next_layer(const char *_Nullable buf)
 {
 	/*
 	 * Need not to free() after use.
 	 */
+	if (buf == NULL) {
+		return NULL;
+	}
 	const char *p = buf;
 	// Reach the first layer.
 	for (size_t i = 0; i < strlen(p); i++) {
@@ -182,7 +185,7 @@ static char *next_layer(const char *buf)
 	}
 	return NULL;
 }
-static char *current_key(const char *buf)
+static char *current_key(const char *_Nonnull buf)
 {
 	/*
 	 * Warning: free() after use.
@@ -220,7 +223,7 @@ static char *current_key(const char *buf)
 	free(tmp);
 	return ret;
 }
-static char *parse_value(const char *buf)
+static char *parse_value(const char *_Nullable buf)
 {
 	/*
 	 * Warning: free() after use.
@@ -290,7 +293,7 @@ static char *parse_value(const char *buf)
 	free(tmp);
 	return ret;
 }
-static char *current_value(const char *buf)
+static char *current_value(const char *_Nonnull buf)
 {
 	/*
 	 * Warning: free() after use.
@@ -354,7 +357,7 @@ static char *current_value(const char *buf)
 	free(tmp);
 	return ret;
 }
-static char *json_get_key_one_level(const char *buf, const char *key)
+static char *json_get_key_one_level(const char *_Nonnull buf, const char *_Nonnull key)
 {
 	/*
 	 * Warning: free() after use.
@@ -381,7 +384,7 @@ static char *json_get_key_one_level(const char *buf, const char *key)
 	}
 	return NULL;
 }
-char *json_get_key(const char *buf, const char *key)
+char *json_get_key(const char *_Nonnull buf, const char *_Nonnull key)
 {
 	/*
 	 * Example json:
@@ -418,7 +421,7 @@ char *json_get_key(const char *buf, const char *key)
 	free(keybuf);
 	return ret;
 }
-size_t json_anon_layer_get_key_array(const char *buf, const char *key, char ***array)
+size_t json_anon_layer_get_key_array(const char *_Nonnull buf, const char *_Nonnull key, char ***_Nullable array)
 {
 	/*
 	 * Warning: free() after use.
@@ -436,7 +439,7 @@ size_t json_anon_layer_get_key_array(const char *buf, const char *key, char ***a
 	size_t ret = 0;
 	const char *p = tmp;
 	while (p != NULL) {
-		(*array)[ret] = json_get_key_one_level(p, key);
+		(*array)[ret] = json_get_key(p, key);
 		ret++;
 		(*array) = realloc((*array), sizeof(char *) * (ret + 1));
 		(*array)[ret] = NULL;
@@ -445,7 +448,7 @@ size_t json_anon_layer_get_key_array(const char *buf, const char *key, char ***a
 	free(tmp);
 	return ret;
 }
-char *json_anon_layer_get_key(const char *buf, const char *key, const char *value, const char *key_to_get)
+char *json_anon_layer_get_key(const char *_Nonnull buf, const char *_Nonnull key, const char *_Nonnull value, const char *_Nonnull key_to_get)
 {
 	/*
 	 * Warning: free() after use.
@@ -455,13 +458,13 @@ char *json_anon_layer_get_key(const char *buf, const char *key, const char *valu
 	const char *p = buf;
 	char *valtmp = NULL;
 	while (p != NULL) {
-		valtmp = json_get_key_one_level(p, key);
+		valtmp = json_get_key(p, key);
 		if (valtmp == NULL) {
 			p = next_layer(p);
 			continue;
 		}
 		if (strcmp(valtmp, value) == 0) {
-			char *ret = json_get_key_one_level(p, key_to_get);
+			char *ret = json_get_key(p, key_to_get);
 			free(valtmp);
 			return ret;
 		}
@@ -470,7 +473,7 @@ char *json_anon_layer_get_key(const char *buf, const char *key, const char *valu
 	}
 	return NULL;
 }
-char *json_open_file(const char *path)
+char *json_open_file(const char *_Nonnull path)
 {
 	/*
 	 * Warning: free() after use.
@@ -481,7 +484,7 @@ char *json_open_file(const char *path)
 	}
 	char *ret = malloc((size_t)st.st_size + 3);
 	int fd = open(path, O_RDONLY | O_CLOEXEC);
-	read(fd, ret, st.st_size);
+	read(fd, ret, (size_t)st.st_size);
 	ret[st.st_size] = '\0';
 	return ret;
 }
